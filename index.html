@@ -1,0 +1,848 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Blood🩸Doctor | MDS-SF3B1 Clinical Dilemma Generator</title>
+    <style>
+        :root {
+            --primary-red: #dc0032;
+            --secondary-blue: #003f87;
+            --accent-purple: #6b2d5c;
+            --light-gray: #f5f5f7;
+            --medium-gray: #e8e8ed;
+            --dark-gray: #1d1d1f;
+            --success-green: #10a37f;
+            --warning-orange: #ff6b35;
+            --info-blue: #4a90e2;
+            --card-bg: #ffffff;
+            --correct: #10a37f;
+            --incorrect: #dc0032;
+            --neutral: #6b2d5c;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            background: linear-gradient(135deg, #f5f5f7 0%, #e8e8ed 100%);
+            color: var(--dark-gray);
+            line-height: 1.6;
+            min-height: 100vh;
+        }
+
+        .header {
+            background: linear-gradient(135deg, var(--primary-red) 0%, var(--accent-purple) 50%, var(--secondary-blue) 100%);
+            color: white;
+            padding: 1.8rem 1rem 1.2rem;
+            text-align: center;
+            box-shadow: 0 4px 24px rgba(0,0,0,0.18);
+            position: sticky; top: 0; z-index: 100;
+        }
+        .header h1 { font-size: 2rem; font-weight: 800; text-shadow: 2px 2px 6px rgba(0,0,0,0.25); }
+        .header h1 .emoji { font-size: 1.6rem; }
+        .header .subtitle { font-size: 1.05rem; opacity: 0.93; margin-top: 0.3rem; font-weight: 400; }
+        .header .chapter-tag {
+            display: inline-block;
+            background: rgba(255,255,255,0.18);
+            padding: 0.2rem 0.9rem;
+            border-radius: 20px;
+            font-size: 0.82rem;
+            margin-top: 0.5rem;
+            backdrop-filter: blur(4px);
+            border: 1px solid rgba(255,255,255,0.2);
+        }
+
+        .container { max-width: 900px; margin: 0 auto; padding: 1.5rem 1rem 3rem; }
+
+        /* Landing Screen */
+        .landing { text-align: center; padding: 2rem 0; }
+        .landing-icon { font-size: 4.5rem; margin-bottom: 1rem; filter: drop-shadow(0 4px 12px rgba(0,0,0,0.15)); }
+        .landing h2 { font-size: 1.7rem; color: var(--secondary-blue); margin-bottom: 0.5rem; }
+        .landing p { color: #666; max-width: 600px; margin: 0 auto 1.5rem; font-size: 1rem; }
+
+        .stats-bar {
+            display: flex; justify-content: center; gap: 1.5rem; flex-wrap: wrap;
+            margin: 1.5rem 0;
+        }
+        .stat-item {
+            background: white; border-radius: 14px; padding: 1rem 1.5rem;
+            box-shadow: 0 4px 16px rgba(0,0,0,0.07);
+            min-width: 120px; text-align: center;
+        }
+        .stat-item .stat-num { font-size: 1.8rem; font-weight: 800; color: var(--primary-red); }
+        .stat-item .stat-label { font-size: 0.78rem; color: #888; text-transform: uppercase; letter-spacing: 0.5px; }
+
+        .topic-grid {
+            display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1rem; margin: 1.5rem 0;
+        }
+        .topic-card {
+            background: white; border-radius: 16px; padding: 1.5rem;
+            box-shadow: 0 4px 18px rgba(0,0,0,0.07);
+            cursor: pointer; transition: all 0.3s ease;
+            border: 2px solid transparent;
+            text-align: left;
+        }
+        .topic-card:hover { transform: translateY(-3px); box-shadow: 0 8px 30px rgba(0,0,0,0.12); border-color: var(--info-blue); }
+        .topic-card .topic-icon { font-size: 2rem; margin-bottom: 0.6rem; }
+        .topic-card h3 { font-size: 1.05rem; color: var(--secondary-blue); margin-bottom: 0.3rem; }
+        .topic-card p { font-size: 0.85rem; color: #777; }
+        .topic-card .q-count {
+            display: inline-block; background: var(--light-gray); border-radius: 10px;
+            padding: 0.15rem 0.6rem; font-size: 0.75rem; color: #555; margin-top: 0.5rem;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, var(--primary-red), var(--accent-purple));
+            color: white; border: none; padding: 0.9rem 2.5rem;
+            border-radius: 50px; font-size: 1.05rem; font-weight: 600;
+            cursor: pointer; transition: all 0.3s ease;
+            box-shadow: 0 4px 16px rgba(220,0,50,0.3);
+            display: inline-flex; align-items: center; gap: 0.5rem;
+        }
+        .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 8px 24px rgba(220,0,50,0.4); }
+
+        .btn-secondary {
+            background: white; color: var(--secondary-blue); border: 2px solid var(--secondary-blue);
+            padding: 0.7rem 1.8rem; border-radius: 50px; font-size: 0.95rem; font-weight: 600;
+            cursor: pointer; transition: all 0.3s ease;
+        }
+        .btn-secondary:hover { background: var(--secondary-blue); color: white; }
+
+        .btn-sm {
+            padding: 0.5rem 1.2rem; font-size: 0.85rem; border-radius: 30px;
+            border: none; cursor: pointer; font-weight: 600; transition: all 0.2s;
+        }
+
+        /* Scenario Card */
+        .scenario-card {
+            background: white; border-radius: 20px; overflow: hidden;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.1);
+            animation: slideUp 0.4s ease-out;
+        }
+        @keyframes slideUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+
+        .scenario-header {
+            background: linear-gradient(135deg, var(--secondary-blue), var(--accent-purple));
+            color: white; padding: 1.3rem 1.8rem;
+            display: flex; justify-content: space-between; align-items: center;
+        }
+        .scenario-header .scenario-tag {
+            background: rgba(255,255,255,0.2); padding: 0.2rem 0.8rem;
+            border-radius: 20px; font-size: 0.78rem; backdrop-filter: blur(4px);
+        }
+        .scenario-header .scenario-num { font-size: 0.85rem; opacity: 0.9; }
+
+        .scenario-body { padding: 1.8rem; }
+        .scenario-body h3 { font-size: 1.2rem; color: var(--secondary-blue); margin-bottom: 0.8rem; }
+
+        .clinical-vignette {
+            background: linear-gradient(135deg, #f8f9ff, #f0f4ff);
+            border-left: 4px solid var(--info-blue);
+            border-radius: 0 12px 12px 0;
+            padding: 1.2rem 1.4rem; margin-bottom: 1.5rem;
+            font-size: 0.95rem; line-height: 1.7;
+        }
+        .clinical-vignette strong { color: var(--secondary-blue); }
+
+        .lab-values {
+            display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 0.6rem; margin: 1rem 0;
+        }
+        .lab-item {
+            background: #f7f7fa; border-radius: 10px; padding: 0.5rem 0.8rem;
+            display: flex; justify-content: space-between; font-size: 0.88rem;
+            border: 1px solid #eee;
+        }
+        .lab-item .lab-name { color: #666; }
+        .lab-item .lab-val { font-weight: 700; color: var(--dark-gray); }
+        .lab-item .lab-val.abnormal { color: var(--primary-red); }
+
+        .question-text {
+            font-size: 1.05rem; font-weight: 600; color: var(--dark-gray);
+            margin: 1.2rem 0 1rem; padding-left: 0.3rem;
+            border-left: 3px solid var(--primary-red); padding-left: 0.8rem;
+        }
+
+        .options-list { display: flex; flex-direction: column; gap: 0.7rem; }
+        .option-btn {
+            background: #f8f9fa; border: 2px solid #e0e0e0; border-radius: 14px;
+            padding: 1rem 1.2rem; text-align: left; cursor: pointer;
+            font-size: 0.95rem; transition: all 0.25s ease;
+            display: flex; align-items: flex-start; gap: 0.8rem;
+        }
+        .option-btn:hover:not(.disabled) { border-color: var(--info-blue); background: #f0f5ff; transform: translateX(4px); }
+        .option-btn .opt-letter {
+            background: var(--secondary-blue); color: white; width: 28px; height: 28px;
+            border-radius: 50%; display: flex; align-items: center; justify-content: center;
+            font-weight: 700; font-size: 0.85rem; flex-shrink: 0; margin-top: 1px;
+        }
+        .option-btn.correct { border-color: var(--correct); background: #e8faf3; }
+        .option-btn.correct .opt-letter { background: var(--correct); }
+        .option-btn.incorrect { border-color: var(--incorrect); background: #fff0f0; }
+        .option-btn.incorrect .opt-letter { background: var(--incorrect); }
+        .option-btn.disabled { cursor: default; opacity: 0.85; }
+
+        /* Feedback */
+        .feedback-box {
+            margin-top: 1.2rem; border-radius: 14px; padding: 1.3rem 1.5rem;
+            animation: fadeIn 0.4s ease;
+        }
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+        .feedback-box.correct-fb { background: linear-gradient(135deg, #e8faf3, #d5f5e8); border: 1px solid #a3e4c8; }
+        .feedback-box.incorrect-fb { background: linear-gradient(135deg, #fff0f0, #ffe0e0); border: 1px solid #f5b8b8; }
+        .feedback-box .fb-title { font-weight: 700; font-size: 1rem; margin-bottom: 0.5rem; display: flex; align-items: center; gap: 0.4rem; }
+        .feedback-box .fb-title.correct-t { color: var(--correct); }
+        .feedback-box .fb-title.incorrect-t { color: var(--incorrect); }
+        .feedback-box .fb-text { font-size: 0.92rem; color: #444; line-height: 1.65; }
+        .feedback-box .pearl {
+            background: rgba(255,255,255,0.7); border-radius: 10px; padding: 0.8rem 1rem;
+            margin-top: 0.8rem; font-size: 0.88rem; border-left: 3px solid var(--warning-orange);
+        }
+        .feedback-box .pearl strong { color: var(--warning-orange); }
+
+        .nav-buttons {
+            display: flex; justify-content: space-between; align-items: center;
+            margin-top: 1.5rem; flex-wrap: wrap; gap: 0.8rem;
+        }
+
+        /* Progress */
+        .progress-bar-wrap {
+            background: #e8e8ed; border-radius: 20px; height: 8px;
+            margin: 1rem 0 0.3rem; overflow: hidden;
+        }
+        .progress-fill {
+            height: 100%; background: linear-gradient(90deg, var(--success-green), var(--info-blue));
+            border-radius: 20px; transition: width 0.5s ease;
+        }
+        .progress-text { font-size: 0.8rem; color: #888; text-align: right; }
+
+        /* Score Screen */
+        .score-screen { text-align: center; padding: 2rem 0; }
+        .score-circle {
+            width: 160px; height: 160px; border-radius: 50%;
+            background: conic-gradient(var(--success-green) calc(var(--pct) * 3.6deg), #e8e8ed calc(var(--pct) * 3.6deg));
+            display: flex; align-items: center; justify-content: center;
+            margin: 1.5rem auto; position: relative;
+        }
+        .score-circle-inner {
+            width: 130px; height: 130px; border-radius: 50%; background: white;
+            display: flex; align-items: center; justify-content: center;
+            flex-direction: column; box-shadow: inset 0 2px 8px rgba(0,0,0,0.05);
+        }
+        .score-circle-inner .pct { font-size: 2.5rem; font-weight: 800; color: var(--secondary-blue); line-height: 1; }
+        .score-circle-inner .pct-label { font-size: 0.75rem; color: #888; }
+
+        .score-grade {
+            font-size: 1.4rem; font-weight: 700; margin: 0.5rem 0;
+        }
+        .score-detail { color: #666; font-size: 0.95rem; margin-bottom: 1.5rem; }
+
+        .review-list { text-align: left; margin: 1.5rem 0; }
+        .review-item {
+            background: white; border-radius: 12px; padding: 1rem 1.2rem;
+            margin-bottom: 0.6rem; display: flex; align-items: center; gap: 0.8rem;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+            font-size: 0.9rem; cursor: pointer; transition: all 0.2s;
+        }
+        .review-item:hover { transform: translateX(4px); box-shadow: 0 4px 16px rgba(0,0,0,0.1); }
+        .review-icon { font-size: 1.3rem; }
+        .review-item .ri-text { flex: 1; }
+        .review-item .ri-topic { font-size: 0.75rem; color: #999; }
+
+        .footer-tag {
+            text-align: center; padding: 2rem 1rem 1rem;
+            font-size: 0.8rem; color: #999;
+        }
+        .footer-tag a { color: var(--primary-red); text-decoration: none; font-weight: 600; }
+
+        @media (max-width: 600px) {
+            .header h1 { font-size: 1.5rem; }
+            .header { padding: 1.2rem 0.8rem 0.8rem; }
+            .scenario-body { padding: 1.2rem; }
+            .topic-grid { grid-template-columns: 1fr; }
+            .lab-values { grid-template-columns: 1fr; }
+            .stats-bar { gap: 0.8rem; }
+            .stat-item { min-width: 90px; padding: 0.7rem 1rem; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="header">
+    <h1><span class="emoji">🧬</span> Clinical Dilemma Generator</h1>
+    <div class="subtitle">MDS with Mutated SF3B1 &mdash; ICC Classification</div>
+    <div class="chapter-tag">Chapter 13 &bull; Blood🩸Doctor #BloodDoctor</div>
+</div>
+
+<div class="container" id="app"></div>
+
+<div class="footer-tag">
+    <p>Blood🩸Doctor &bull; #BloodDoctor &bull; ICC Classification Series</p>
+    <p>For educational purposes only. Not a substitute for clinical judgement.</p>
+</div>
+
+<script>
+const TOPICS = {
+    diagnosis: { icon: "🔬", name: "Diagnostic Criteria", desc: "SF3B1 mutation, ring sideroblasts, exclusion criteria" },
+    genetics: { icon: "🧬", name: "Genetics & Mutations", desc: "Co-mutations, VAF thresholds, mutation clusters" },
+    classification: { icon: "📋", name: "Classification Pitfalls", desc: "MDS vs MDS/MPN, CCUS, reclassification triggers" },
+    treatment: { icon: "💊", name: "Treatment Decisions", desc: "ESAs, luspatercept, iron chelation strategies" },
+    prognosis: { icon: "📊", name: "Prognosis & Risk", desc: "Survival data, AML transformation, adverse features" },
+    morphology: { icon: "🔎", name: "Morphology & Immunophenotype", desc: "Ring sideroblasts, CD markers, blast assessment" }
+};
+
+const DILEMMAS = [
+    // DIAGNOSIS
+    {
+        topic: "diagnosis",
+        title: "The Missing Ring Sideroblasts",
+        vignette: "A 72-year-old woman presents with <strong>macrocytic anaemia</strong> (Hb 88 g/L, MCV 108 fL). Bone marrow shows <strong>erythroid dysplasia</strong> with <strong>8% ring sideroblasts</strong> on iron stain. Next-generation sequencing reveals an <strong>SF3B1 K700E mutation at VAF 38%</strong>. Blasts are 2% in marrow. Karyotype is normal.",
+        labs: [
+            { name: "Hb", val: "88 g/L", abn: true },
+            { name: "MCV", val: "108 fL", abn: true },
+            { name: "Platelets", val: "210 × 10⁹/L", abn: false },
+            { name: "Ring sideroblasts", val: "8%", abn: false },
+            { name: "BM blasts", val: "2%", abn: false },
+            { name: "SF3B1 VAF", val: "38%", abn: false }
+        ],
+        question: "Does this patient meet the ICC criteria for MDS with mutated SF3B1?",
+        options: [
+            { letter: "A", text: "No — ring sideroblasts must be ≥15% for diagnosis", correct: false },
+            { letter: "B", text: "Yes — SF3B1 mutation at VAF ≥10% is sufficient; ring sideroblasts are no longer required", correct: true },
+            { letter: "C", text: "No — ring sideroblasts must be ≥5% with specific morphology", correct: false },
+            { letter: "D", text: "Cannot classify — need FISH for del(5q) first", correct: false }
+        ],
+        correctIdx: 1,
+        explanation: "Under the ICC classification, ring sideroblasts are no longer required for diagnosis of MDS-SF3B1. An SF3B1 pathogenic mutation at VAF ≥10% is sufficient, provided other criteria are met (cytopenia, no excess blasts, no disqualifying cytogenetics or mutations).",
+        pearl: "This is a major shift from WHO 2017, which required ≥15% ring sideroblasts (or ≥5% with SF3B1 mutation). The ICC recognises SF3B1 mutation as the defining genetic event."
+    },
+    {
+        topic: "diagnosis",
+        title: "The Exclusion Trap",
+        vignette: "A 65-year-old man has <strong>persistent anaemia</strong> (Hb 95 g/L) with <strong>22% ring sideroblasts</strong>. SF3B1 is mutated at <strong>VAF 42%</strong>. However, cytogenetics reveals a <strong>complex karyotype</strong> (≥3 abnormalities). Blasts are 3% in the marrow. No TP53 mutation detected.",
+        labs: [
+            { name: "Hb", val: "95 g/L", abn: true },
+            { name: "Ring sideroblasts", val: "22%", abn: false },
+            { name: "SF3B1 VAF", val: "42%", abn: false },
+            { name: "BM blasts", val: "3%", abn: false },
+            { name: "Karyotype", val: "Complex (≥3)", abn: true }
+        ],
+        question: "What is the correct classification for this patient?",
+        options: [
+            { letter: "A", text: "MDS with mutated SF3B1 — the SF3B1 mutation and ring sideroblasts are defining", correct: false },
+            { letter: "B", text: "MDS, not otherwise specified (MDS-NOS)", correct: true },
+            { letter: "C", text: "MDS with excess blasts", correct: false },
+            { letter: "D", text: "MDS with biallelic TP53 inactivation", correct: false }
+        ],
+        correctIdx: 1,
+        explanation: "Complex karyotype (≥3 abnormalities) is an exclusion criterion for MDS-SF3B1 under ICC. Even with SF3B1 mutation and ring sideroblasts, the complex karyotype disqualifies this diagnosis. The case would be classified as MDS-NOS (since blasts are <5% and TP53 is not multi-hit).",
+        pearl: "Other exclusion criteria include: del(5q), monosomy 7/del(7q), abnormal 3q26.2, RUNX1 mutation, and multi-hit TP53 inactivation. These override the SF3B1 finding."
+    },
+    // GENETICS
+    {
+        topic: "genetics",
+        title: "The Low-VAF Conundrum",
+        vignette: "A 68-year-old woman has <strong>mild anaemia</strong> (Hb 105 g/L) with <strong>no morphological dysplasia</strong> on bone marrow examination. NGS panel detects an <strong>SF3B1 mutation at VAF 7%</strong>. No other mutations. Cytogenetics normal. No ring sideroblasts seen.",
+        labs: [
+            { name: "Hb", val: "105 g/L", abn: true },
+            { name: "WBC", val: "5.8 × 10⁹/L", abn: false },
+            { name: "Platelets", val: "195 × 10⁹/L", abn: false },
+            { name: "SF3B1 VAF", val: "7%", abn: true },
+            { name: "Ring sideroblasts", val: "0%", abn: false },
+            { name: "Dysplasia", val: "None", abn: false }
+        ],
+        question: "How should this finding be classified?",
+        options: [
+            { letter: "A", text: "MDS with mutated SF3B1 — any SF3B1 mutation qualifies", correct: false },
+            { letter: "B", text: "Clonal haematopoiesis of indeterminate potential (CHIP)", correct: false },
+            { letter: "C", text: "Clonal cytopenia of uncertain significance (CCUS)", correct: true },
+            { letter: "D", text: "Ignore — likely a sequencing artefact below 10% VAF", correct: false }
+        ],
+        correctIdx: 2,
+        explanation: "SF3B1 at VAF <10% with cytopenia but no dysplasia fits CCUS — clonal cytopenia of uncertain significance. The ICC requires VAF ≥10% for MDS-SF3B1 diagnosis. Since there IS a cytopenia (anaemia), this is CCUS rather than CHIP (which requires no cytopenia).",
+        pearl: "CHIP = clonal mutation WITHOUT cytopenia. CCUS = clonal mutation WITH cytopenia but without morphological criteria for MDS. About 86% of CCUS patients with SF3B1 mutations eventually progress to MDS."
+    },
+    {
+        topic: "genetics",
+        title: "The Dangerous Co-Mutation",
+        vignette: "A 70-year-old man is diagnosed with <strong>MDS-SF3B1</strong> (SF3B1 K700E, VAF 35%). You order an extended mutation panel and find co-mutations in <strong>DNMT3A (VAF 25%)</strong> and <strong>RUNX1 (VAF 18%)</strong>. Ring sideroblasts are 30%. Karyotype is normal.",
+        labs: [
+            { name: "SF3B1", val: "K700E, VAF 35%", abn: false },
+            { name: "DNMT3A", val: "VAF 25%", abn: false },
+            { name: "RUNX1", val: "VAF 18%", abn: true },
+            { name: "Ring sideroblasts", val: "30%", abn: false },
+            { name: "Karyotype", val: "Normal", abn: false }
+        ],
+        question: "How does the RUNX1 co-mutation affect the classification?",
+        options: [
+            { letter: "A", text: "No impact — RUNX1 is a neutral co-mutation like DNMT3A", correct: false },
+            { letter: "B", text: "Reclassifies from MDS-SF3B1 to MDS-NOS — RUNX1 is an exclusion criterion", correct: true },
+            { letter: "C", text: "Upgrades to MDS with excess blasts", correct: false },
+            { letter: "D", text: "Worsens prognosis but does not change classification", correct: false }
+        ],
+        correctIdx: 1,
+        explanation: "RUNX1 mutation is a specific exclusion criterion for MDS-SF3B1. Despite the classical SF3B1 mutation and abundant ring sideroblasts, the RUNX1 co-mutation mandates reclassification. DNMT3A is a neutral co-mutation that does NOT affect classification.",
+        pearl: "Key distinction: DNMT3A, TET2, and ASXL1 are neutral co-mutations (don't affect classification or prognosis in MDS-SF3B1). But RUNX1 is an exclusion criterion. Other adverse co-mutations include BCOR, BCORL1, NRAS, SRSF2, and STAG2."
+    },
+    // CLASSIFICATION
+    {
+        topic: "classification",
+        title: "Thrombocytosis Dilemma",
+        vignette: "A 60-year-old woman presents with <strong>anaemia</strong> (Hb 92 g/L) and <strong>thrombocytosis</strong> (platelets 620 × 10⁹/L). BM shows <strong>25% ring sideroblasts</strong> and megakaryocytic hyperplasia. SF3B1 is mutated (VAF 40%). A <strong>JAK2 V617F</strong> mutation is also detected at <strong>VAF 15%</strong>. No excess blasts. Normal karyotype.",
+        labs: [
+            { name: "Hb", val: "92 g/L", abn: true },
+            { name: "Platelets", val: "620 × 10⁹/L", abn: true },
+            { name: "Ring sideroblasts", val: "25%", abn: false },
+            { name: "SF3B1 VAF", val: "40%", abn: false },
+            { name: "JAK2 V617F", val: "VAF 15%", abn: true },
+            { name: "BM blasts", val: "1%", abn: false }
+        ],
+        question: "What is the most appropriate classification?",
+        options: [
+            { letter: "A", text: "MDS with mutated SF3B1", correct: false },
+            { letter: "B", text: "MDS/MPN with SF3B1 mutation and thrombocytosis (MDS/MPN-SF3B1-T)", correct: true },
+            { letter: "C", text: "Essential thrombocythaemia with coincidental SF3B1 mutation", correct: false },
+            { letter: "D", text: "MPN, unclassifiable", correct: false }
+        ],
+        correctIdx: 1,
+        explanation: "The combination of SF3B1 mutation with JAK2 V617F (or CALR/MPL) and thrombocytosis indicates MDS/MPN-SF3B1-T — a distinct overlap entity. This is NOT pure MDS-SF3B1 because the JAK2 co-mutation drives a proliferative (MPN) phenotype alongside the dysplastic features.",
+        pearl: "MDS/MPN-SF3B1-T is a separate ICC entity. The clue is persistent thrombocytosis with concurrent SF3B1 + JAK2/CALR/MPL mutations. These patients have features of both MDS (ring sideroblasts, anaemia) and MPN (thrombocytosis, megakaryocytic proliferation)."
+    },
+    {
+        topic: "classification",
+        title: "The Three Mutation Clusters",
+        vignette: "You review bone marrow findings in three MDS patients, all with <strong>>15% ring sideroblasts</strong>:<br><br><strong>Patient A:</strong> SF3B1 K700E (VAF 33%), normal karyotype<br><strong>Patient B:</strong> SRSF2 P95H (VAF 28%), no SF3B1, +8<br><strong>Patient C:</strong> TP53 R175H (VAF 45%) + TP53 LOH, no SF3B1",
+        labs: [],
+        question: "Which patient(s) qualify for the diagnosis of MDS with mutated SF3B1?",
+        options: [
+            { letter: "A", text: "All three — ring sideroblasts ≥15% is the defining feature", correct: false },
+            { letter: "B", text: "Patients A and B — both have splicing factor mutations", correct: false },
+            { letter: "C", text: "Only Patient A — SF3B1 mutation is specifically required", correct: true },
+            { letter: "D", text: "None — additional testing is needed for all", correct: false }
+        ],
+        correctIdx: 2,
+        explanation: "Only Patient A qualifies. MDS-SF3B1 requires a pathogenic SF3B1 mutation. Patients B (SRSF2) and C (multi-hit TP53) represent different molecular clusters of MDS with ring sideroblasts. Patient C with multi-hit TP53 would be classified as MDS with biallelic TP53 inactivation, regardless of ring sideroblasts.",
+        pearl: "Three distinct molecular clusters cause ring sideroblasts: (1) SF3B1 — best prognosis, (2) SRSF2 — intermediate, (3) multi-hit TP53 — worst prognosis. Ring sideroblasts are a morphological phenotype, not a single disease. The underlying mutation determines the classification."
+    },
+    // TREATMENT
+    {
+        topic: "treatment",
+        title: "Transfusion-Dependent Anaemia",
+        vignette: "A 75-year-old man with <strong>MDS-SF3B1</strong> (diagnosed 18 months ago) has become <strong>transfusion-dependent</strong>, requiring 2 units packed RBCs every 3 weeks. He was started on <strong>erythropoiesis-stimulating agents (ESAs)</strong> 6 months ago but remains transfusion-dependent. Serum EPO was <strong>180 IU/L</strong> at baseline. Ferritin is now <strong>1,800 µg/L</strong>.",
+        labs: [
+            { name: "Hb (pre-transfusion)", val: "72 g/L", abn: true },
+            { name: "Serum EPO", val: "180 IU/L", abn: true },
+            { name: "Ferritin", val: "1,800 µg/L", abn: true },
+            { name: "Transfusion need", val: "2U / 3 weeks", abn: true },
+            { name: "ESA duration", val: "6 months", abn: false }
+        ],
+        question: "What is the most appropriate next therapeutic step?",
+        options: [
+            { letter: "A", text: "Increase ESA dose and continue for another 6 months", correct: false },
+            { letter: "B", text: "Start luspatercept — indicated for ESA-refractory transfusion-dependent MDS-SF3B1", correct: true },
+            { letter: "C", text: "Proceed directly to allogeneic stem cell transplant", correct: false },
+            { letter: "D", text: "Start iron chelation alone and stop ESA", correct: false }
+        ],
+        correctIdx: 1,
+        explanation: "Luspatercept is specifically indicated for transfusion-dependent MDS-SF3B1 patients who have failed or are refractory to ESAs. It acts by promoting late-stage erythropoiesis through inhibition of TGF-β superfamily signalling. Iron chelation should also be considered given the elevated ferritin, but the priority is addressing the anaemia.",
+        pearl: "Luspatercept was shown to reduce transfusion burden in the MEDALIST trial. It is particularly effective in SF3B1-mutated MDS because ineffective erythropoiesis is the dominant pathology. ESA response is lower when baseline EPO >200 IU/L."
+    },
+    {
+        topic: "treatment",
+        title: "Iron Overload Without Transfusions",
+        vignette: "A 62-year-old woman with <strong>newly diagnosed MDS-SF3B1</strong> is <strong>not yet transfusion-dependent</strong> (Hb 96 g/L). However, her ferritin is <strong>1,200 µg/L</strong> and transferrin saturation is <strong>78%</strong>. She has received <strong>zero transfusions</strong>. Liver MRI shows moderate iron overload.",
+        labs: [
+            { name: "Hb", val: "96 g/L", abn: true },
+            { name: "Ferritin", val: "1,200 µg/L", abn: true },
+            { name: "TSAT", val: "78%", abn: true },
+            { name: "Transfusions", val: "None", abn: false },
+            { name: "Liver MRI", val: "Moderate iron overload", abn: true }
+        ],
+        question: "How do you explain the iron overload without transfusions, and what is your approach?",
+        options: [
+            { letter: "A", text: "Screen for hereditary haemochromatosis — MDS does not cause iron overload without transfusions", correct: false },
+            { letter: "B", text: "Ineffective erythropoiesis suppresses hepcidin, causing increased intestinal iron absorption — consider iron chelation", correct: true },
+            { letter: "C", text: "This is a laboratory artefact — ferritin is an acute phase reactant", correct: false },
+            { letter: "D", text: "The iron overload is clinically insignificant at this stage — monitor only", correct: false }
+        ],
+        correctIdx: 1,
+        explanation: "In MDS-SF3B1, ineffective erythropoiesis leads to increased erythroferrone, which suppresses hepcidin. Low hepcidin causes increased intestinal iron absorption — iron overload can develop WITHOUT transfusions. This is a recognised phenomenon in ring sideroblast-associated MDS.",
+        pearl: "Iron overload in MDS-SF3B1 has a dual mechanism: (1) transfusional haemosiderosis (if transfused), and (2) hepcidin suppression from ineffective erythropoiesis. The second mechanism means iron chelation may be needed even in non-transfused patients with evidence of organ iron loading."
+    },
+    // PROGNOSIS
+    {
+        topic: "prognosis",
+        title: "The Adverse Co-Mutation Profile",
+        vignette: "Two patients are newly diagnosed with <strong>MDS-SF3B1</strong>:<br><br><strong>Patient X:</strong> SF3B1 K700E + TET2 + DNMT3A co-mutations. Normal karyotype.<br><strong>Patient Y:</strong> SF3B1 K700E + SRSF2 + STAG2 co-mutations. Normal karyotype.<br><br>Both have similar age, blast counts, and transfusion burden.",
+        labs: [],
+        question: "Which patient has a worse prognosis, and why?",
+        options: [
+            { letter: "A", text: "Patient X — TET2 and DNMT3A are high-risk epigenetic mutations", correct: false },
+            { letter: "B", text: "Same prognosis — both have SF3B1 mutations which override co-mutation effects", correct: false },
+            { letter: "C", text: "Patient Y — SRSF2 and STAG2 are adverse co-mutations that worsen outcomes in MDS-SF3B1", correct: true },
+            { letter: "D", text: "Cannot be determined without IPSS-R scoring", correct: false }
+        ],
+        correctIdx: 2,
+        explanation: "Patient Y has a worse prognosis. SRSF2 and STAG2 are adverse co-mutations in MDS-SF3B1 that independently worsen overall survival and increase AML transformation risk. Patient X's co-mutations (TET2, DNMT3A) are considered prognostically neutral in the context of SF3B1-mutated MDS.",
+        pearl: "Adverse co-mutations in MDS-SF3B1: BCOR, BCORL1, NRAS, SRSF2, STAG2. Neutral co-mutations: DNMT3A, TET2, ASXL1. The number and type of co-mutations refine prognosis beyond IPSS-R. MDS-SF3B1 overall has good prognosis (median OS 72-114 months, 5% AML risk), but adverse co-mutations can significantly shorten this."
+    },
+    {
+        topic: "prognosis",
+        title: "The Long-Term Survivor Question",
+        vignette: "A 58-year-old man with <strong>MDS-SF3B1</strong> asks about his long-term outlook. His SF3B1 mutation is at <strong>hotspot K700E</strong>, with co-mutations only in <strong>TET2</strong>. Karyotype is normal. He has mild anaemia (Hb 108 g/L) and is not transfusion-dependent.",
+        labs: [
+            { name: "Hb", val: "108 g/L", abn: true },
+            { name: "SF3B1", val: "K700E", abn: false },
+            { name: "Co-mutations", val: "TET2 only", abn: false },
+            { name: "Karyotype", val: "Normal", abn: false },
+            { name: "BM blasts", val: "1%", abn: false }
+        ],
+        question: "What is the most accurate prognostic information to share?",
+        options: [
+            { letter: "A", text: "Median OS is 2-3 years — MDS is an aggressive malignancy", correct: false },
+            { letter: "B", text: "Median OS is 72-114 months with ~5% lifetime AML transformation risk — favourable among MDS subtypes", correct: true },
+            { letter: "C", text: "50% chance of AML transformation within 5 years", correct: false },
+            { letter: "D", text: "Normal life expectancy — SF3B1 mutation is benign", correct: false }
+        ],
+        correctIdx: 1,
+        explanation: "MDS-SF3B1 carries the most favourable prognosis among MDS subtypes. Median overall survival is 72-114 months (6-9.5 years), and the risk of AML transformation is only ~5%. This patient has additional good prognostic features: hotspot K700E, only neutral co-mutations (TET2), normal karyotype, and low blast count.",
+        pearl: "K700E is the most common SF3B1 hotspot (~55-65% of cases) and is associated with the classical MDS-SF3B1 phenotype. Other hotspot codons include 622, 625, 666, and 662. The favourable prognosis applies specifically to MDS-SF3B1 without adverse co-mutations."
+    },
+    // MORPHOLOGY
+    {
+        topic: "morphology",
+        title: "Defining Ring Sideroblasts",
+        vignette: "A trainee pathologist asks you to review an iron stain from a bone marrow aspirate. They have identified several erythroblasts with <strong>iron granules</strong>. One cell shows <strong>4 iron granules</strong> clustered near the nucleus, and another shows <strong>6 iron granules encircling approximately half the nuclear circumference</strong>.",
+        labs: [],
+        question: "Which cell qualifies as a true ring sideroblast by definition?",
+        options: [
+            { letter: "A", text: "Both cells — any perinuclear iron granules define ring sideroblasts", correct: false },
+            { letter: "B", text: "Only the cell with 6 granules encircling half the nucleus — requires ≥5 granules covering ≥1/3 of the nuclear circumference", correct: true },
+            { letter: "C", text: "Neither — ring sideroblasts require ≥10 granules forming a complete ring", correct: false },
+            { letter: "D", text: "Only the cell with 4 clustered granules — clustering is more important than number", correct: false }
+        ],
+        correctIdx: 1,
+        explanation: "A ring sideroblast is defined as an erythroblast with ≥5 iron granules in a perinuclear distribution encircling ≥1/3 of the nuclear circumference. The cell with 4 granules does not meet the threshold. The cell with 6 granules covering ~50% of the circumference meets both criteria.",
+        pearl: "Ring sideroblasts reflect mitochondrial iron accumulation. In MDS-SF3B1, the SF3B1 mutation causes mis-splicing of ABCB7 (a mitochondrial iron transporter), leading to mitochondrial iron trapping and the characteristic ring sideroblast morphology."
+    },
+    {
+        topic: "morphology",
+        title: "The Immunophenotype Puzzle",
+        vignette: "A bone marrow biopsy from a patient with suspected <strong>MDS-SF3B1</strong> shows prominent erythroid hyperplasia. The haematopathologist recommends immunohistochemistry. The following markers are ordered: <strong>CD71, Glycophorin A, CD117, E-cadherin, and CD34</strong>.",
+        labs: [],
+        question: "What is the primary purpose of CD34 immunohistochemistry in this context?",
+        options: [
+            { letter: "A", text: "To confirm the diagnosis of MDS-SF3B1 by showing erythroid expansion", correct: false },
+            { letter: "B", text: "To identify ring sideroblasts on the biopsy", correct: false },
+            { letter: "C", text: "To exclude increased blasts and ensure the case is not MDS with excess blasts", correct: true },
+            { letter: "D", text: "To quantify the proportion of SF3B1-mutated cells", correct: false }
+        ],
+        correctIdx: 2,
+        explanation: "CD34 IHC is critical to exclude increased blasts. In the context of erythroid-rich marrows (common in MDS-SF3B1), blast enumeration on aspirate smears can be challenging. CD34 staining on the biopsy provides an objective assessment to ensure blasts are not increased, which would reclassify the case.",
+        pearl: "CD71 and Glycophorin A mark erythroid cells. CD117 and E-cadherin highlight left-shifted erythroid precursors. But CD34 is the clinically decisive stain — it answers: 'Are there too many blasts?' This single finding can change classification from MDS-SF3B1 to MDS with excess blasts."
+    }
+];
+
+// App State
+let state = {
+    screen: 'landing',
+    currentTopic: null,
+    currentQIdx: 0,
+    questions: [],
+    answers: [],
+    score: 0,
+    answered: false
+};
+
+function getQuestions(topic) {
+    if (topic === 'all') return [...DILEMMAS].sort(() => Math.random() - 0.5);
+    return DILEMMAS.filter(d => d.topic === topic).sort(() => Math.random() - 0.5);
+}
+
+function render() {
+    const app = document.getElementById('app');
+    if (state.screen === 'landing') renderLanding(app);
+    else if (state.screen === 'quiz') renderQuiz(app);
+    else if (state.screen === 'score') renderScore(app);
+    else if (state.screen === 'review') renderReview(app);
+}
+
+function renderLanding(app) {
+    const totalQ = DILEMMAS.length;
+    const topicCounts = {};
+    DILEMMAS.forEach(d => { topicCounts[d.topic] = (topicCounts[d.topic] || 0) + 1; });
+
+    app.innerHTML = `
+        <div class="landing">
+            <div class="landing-icon">🧠</div>
+            <h2>Test Your Clinical Decision-Making</h2>
+            <p>Navigate real-world diagnostic and therapeutic dilemmas in MDS with mutated SF3B1. Each scenario presents a branching clinical decision based on ICC classification criteria.</p>
+
+            <div class="stats-bar">
+                <div class="stat-item"><div class="stat-num">${totalQ}</div><div class="stat-label">Dilemmas</div></div>
+                <div class="stat-item"><div class="stat-num">${Object.keys(TOPICS).length}</div><div class="stat-label">Topics</div></div>
+                <div class="stat-item"><div class="stat-num">🎯</div><div class="stat-label">Evidence-Based</div></div>
+            </div>
+
+            <h3 style="margin: 1.5rem 0 0.8rem; color: var(--secondary-blue); font-size: 1.1rem;">Choose a Topic or Challenge All</h3>
+
+            <div class="topic-grid">
+                ${Object.entries(TOPICS).map(([key, t]) => `
+                    <div class="topic-card" onclick="startTopic('${key}')">
+                        <div class="topic-icon">${t.icon}</div>
+                        <h3>${t.name}</h3>
+                        <p>${t.desc}</p>
+                        <span class="q-count">${topicCounts[key] || 0} dilemma${(topicCounts[key] || 0) !== 1 ? 's' : ''}</span>
+                    </div>
+                `).join('')}
+            </div>
+
+            <div style="margin-top: 1.5rem;">
+                <button class="btn-primary" onclick="startTopic('all')">
+                    <span>🔥</span> Challenge All ${totalQ} Dilemmas
+                </button>
+            </div>
+        </div>
+    `;
+}
+
+function startTopic(topic) {
+    state.currentTopic = topic;
+    state.questions = getQuestions(topic);
+    state.currentQIdx = 0;
+    state.answers = [];
+    state.score = 0;
+    state.answered = false;
+    state.screen = 'quiz';
+    render();
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+function renderQuiz(app) {
+    const q = state.questions[state.currentQIdx];
+    const total = state.questions.length;
+    const progress = ((state.currentQIdx) / total * 100).toFixed(0);
+    const topicInfo = TOPICS[q.topic];
+
+    app.innerHTML = `
+        <div class="progress-bar-wrap"><div class="progress-fill" style="width:${progress}%"></div></div>
+        <div class="progress-text">Question ${state.currentQIdx + 1} of ${total}</div>
+
+        <div class="scenario-card" style="margin-top: 0.8rem;">
+            <div class="scenario-header">
+                <div>
+                    <span class="scenario-tag">${topicInfo.icon} ${topicInfo.name}</span>
+                </div>
+                <div class="scenario-num">Dilemma #${state.currentQIdx + 1}</div>
+            </div>
+            <div class="scenario-body">
+                <h3>${q.title}</h3>
+                <div class="clinical-vignette">${q.vignette}</div>
+
+                ${q.labs.length > 0 ? `
+                    <div class="lab-values">
+                        ${q.labs.map(l => `
+                            <div class="lab-item">
+                                <span class="lab-name">${l.name}</span>
+                                <span class="lab-val ${l.abn ? 'abnormal' : ''}">${l.val}</span>
+                            </div>
+                        `).join('')}
+                    </div>
+                ` : ''}
+
+                <div class="question-text">${q.question}</div>
+
+                <div class="options-list">
+                    ${q.options.map((opt, i) => `
+                        <div class="option-btn ${state.answered ? (i === q.correctIdx ? 'correct' : (state.answers[state.currentQIdx] === i && i !== q.correctIdx ? 'incorrect' : '')) : ''} ${state.answered ? 'disabled' : ''}"
+                             onclick="${state.answered ? '' : `selectAnswer(${i})`}"
+                             id="opt-${i}">
+                            <span class="opt-letter">${opt.letter}</span>
+                            <span>${opt.text}</span>
+                        </div>
+                    `).join('')}
+                </div>
+
+                <div id="feedback-area"></div>
+
+                ${state.answered ? `
+                    <div class="nav-buttons">
+                        <button class="btn-secondary" onclick="goHome()">← Home</button>
+                        ${state.currentQIdx < total - 1 ?
+                            `<button class="btn-primary" onclick="nextQuestion()">Next Dilemma →</button>` :
+                            `<button class="btn-primary" onclick="showScore()">See Results 📊</button>`
+                        }
+                    </div>
+                ` : ''}
+            </div>
+        </div>
+    `;
+}
+
+function selectAnswer(idx) {
+    if (state.answered) return;
+    state.answered = true;
+    state.answers[state.currentQIdx] = idx;
+    const q = state.questions[state.currentQIdx];
+    const isCorrect = idx === q.correctIdx;
+    if (isCorrect) state.score++;
+
+    // Re-render to show option states
+    renderQuiz(document.getElementById('app'));
+
+    // Now inject feedback
+    const fb = document.getElementById('feedback-area');
+    fb.innerHTML = `
+        <div class="feedback-box ${isCorrect ? 'correct-fb' : 'incorrect-fb'}">
+            <div class="fb-title ${isCorrect ? 'correct-t' : 'incorrect-t'}">
+                ${isCorrect ? '✅ Correct!' : '❌ Incorrect'}
+            </div>
+            <div class="fb-text">${q.explanation}</div>
+            <div class="pearl">
+                <strong>💡 Clinical Pearl:</strong> ${q.pearl}
+            </div>
+        </div>
+    `;
+}
+
+function nextQuestion() {
+    state.currentQIdx++;
+    state.answered = false;
+    state.screen = 'quiz';
+    render();
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+function showScore() {
+    state.screen = 'score';
+    render();
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+function renderScore(app) {
+    const total = state.questions.length;
+    const pct = Math.round((state.score / total) * 100);
+    let grade = '', gradeColor = '';
+    if (pct >= 90) { grade = '🏆 Expert Haematologist!'; gradeColor = 'var(--success-green)'; }
+    else if (pct >= 70) { grade = '⭐ Proficient Clinician'; gradeColor = 'var(--info-blue)'; }
+    else if (pct >= 50) { grade = '📚 Keep Learning'; gradeColor = 'var(--warning-orange)'; }
+    else { grade = '🔬 Review Fundamentals'; gradeColor = 'var(--primary-red)'; }
+
+    const topicName = state.currentTopic === 'all' ? 'All Topics' : TOPICS[state.currentTopic]?.name || '';
+
+    app.innerHTML = `
+        <div class="score-screen">
+            <h2 style="color: var(--secondary-blue); margin-bottom: 0.3rem;">Session Complete</h2>
+            <p style="color: #888; font-size: 0.9rem;">${topicName}</p>
+
+            <div class="score-circle" style="--pct: ${pct}">
+                <div class="score-circle-inner">
+                    <div class="pct">${pct}%</div>
+                    <div class="pct-label">${state.score}/${total}</div>
+                </div>
+            </div>
+
+            <div class="score-grade" style="color: ${gradeColor}">${grade}</div>
+            <p class="score-detail">You answered ${state.score} out of ${total} clinical dilemmas correctly.</p>
+
+            <div class="review-list">
+                <h3 style="font-size: 1rem; color: var(--secondary-blue); margin-bottom: 0.8rem;">📋 Review Your Answers</h3>
+                ${state.questions.map((q, i) => {
+                    const correct = state.answers[i] === q.correctIdx;
+                    return `
+                        <div class="review-item" onclick="reviewQuestion(${i})">
+                            <span class="review-icon">${correct ? '✅' : '❌'}</span>
+                            <div class="ri-text">
+                                <div>${q.title}</div>
+                                <div class="ri-topic">${TOPICS[q.topic].icon} ${TOPICS[q.topic].name}</div>
+                            </div>
+                            <span style="color: #ccc; font-size: 1.2rem;">›</span>
+                        </div>
+                    `;
+                }).join('')}
+            </div>
+
+            <div style="display: flex; gap: 1rem; justify-content: center; margin-top: 1.5rem; flex-wrap: wrap;">
+                <button class="btn-secondary" onclick="goHome()">← Home</button>
+                <button class="btn-primary" onclick="startTopic('${state.currentTopic}')">🔄 Retry</button>
+            </div>
+        </div>
+    `;
+}
+
+function reviewQuestion(idx) {
+    state.screen = 'review';
+    state.currentQIdx = idx;
+    render();
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+function renderReview(app) {
+    const q = state.questions[state.currentQIdx];
+    const userAnswer = state.answers[state.currentQIdx];
+    const isCorrect = userAnswer === q.correctIdx;
+    const topicInfo = TOPICS[q.topic];
+
+    app.innerHTML = `
+        <div style="margin-bottom: 1rem;">
+            <button class="btn-sm" style="background: var(--light-gray); color: var(--secondary-blue);" onclick="showScore()">← Back to Results</button>
+        </div>
+
+        <div class="scenario-card">
+            <div class="scenario-header">
+                <span class="scenario-tag">${topicInfo.icon} ${topicInfo.name}</span>
+                <span class="scenario-num">${isCorrect ? '✅ Correct' : '❌ Incorrect'}</span>
+            </div>
+            <div class="scenario-body">
+                <h3>${q.title}</h3>
+                <div class="clinical-vignette">${q.vignette}</div>
+
+                ${q.labs.length > 0 ? `
+                    <div class="lab-values">
+                        ${q.labs.map(l => `
+                            <div class="lab-item">
+                                <span class="lab-name">${l.name}</span>
+                                <span class="lab-val ${l.abn ? 'abnormal' : ''}">${l.val}</span>
+                            </div>
+                        `).join('')}
+                    </div>
+                ` : ''}
+
+                <div class="question-text">${q.question}</div>
+
+                <div class="options-list">
+                    ${q.options.map((opt, i) => `
+                        <div class="option-btn ${i === q.correctIdx ? 'correct' : (i === userAnswer && i !== q.correctIdx ? 'incorrect' : '')} disabled">
+                            <span class="opt-letter">${opt.letter}</span>
+                            <span>${opt.text} ${i === userAnswer && i !== q.correctIdx ? '(Your answer)' : ''} ${i === q.correctIdx ? '(Correct)' : ''}</span>
+                        </div>
+                    `).join('')}
+                </div>
+
+                <div class="feedback-box ${isCorrect ? 'correct-fb' : 'incorrect-fb'}" style="margin-top: 1.2rem;">
+                    <div class="fb-title ${isCorrect ? 'correct-t' : 'incorrect-t'}">
+                        ${isCorrect ? '✅ You got this right!' : '❌ Review this concept'}
+                    </div>
+                    <div class="fb-text">${q.explanation}</div>
+                    <div class="pearl">
+                        <strong>💡 Clinical Pearl:</strong> ${q.pearl}
+                    </div>
+                </div>
+            </div>
+        </div>
+    `;
+}
+
+function goHome() {
+    state = { screen: 'landing', currentTopic: null, currentQIdx: 0, questions: [], answers: [], score: 0, answered: false };
+    render();
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+// Initial render
+render();
+</script>
+</body>
+</html>
